@@ -6,6 +6,7 @@ from adam import Adam
 from nadam import Nadam
 from muon import Muon
 
+# code from https://www.tensorflow.org/datasets/keras_example
 (ds_train, ds_test), ds_info = tfds.load(
     'mnist',
     split=['train', 'test'],
@@ -38,6 +39,8 @@ ds_test = ds_test.prefetch(tf.data.AUTOTUNE)
 #   tf.keras.layers.Dense(128, activation='relu'),
 #   tf.keras.layers.Dense(10)
 # ])
+
+# written by me
 def create_model():
     inputs = tf.keras.Input(batch_shape=(None, 28, 28))
     x = tf.keras.layers.Reshape((28, 28, 1))(inputs)
