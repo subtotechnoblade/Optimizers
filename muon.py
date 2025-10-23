@@ -22,7 +22,7 @@ class Muon(optimizer.Optimizer):
                  muon_c=2.0315,
                  ns_steps=5,
                  epsilon=1e-8,
-                 name="muon",
+                 name="Muon",
                  **kwargs):
         super().__init__(learning_rate=learning_rate, name=name, **kwargs)
         self.adam_lr_ratio = adam_lr_ratio
