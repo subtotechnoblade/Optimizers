@@ -15,19 +15,19 @@ This project is actively developed. Here is the current status of implemented an
 ## ✅ Implemented Features
 Core Optimizers
 
--[x] Adam: The foundational adaptive optimizer that serves as our primary baseline.
+- [x] Adam: The foundational adaptive optimizer that serves as our primary baseline.
 
--[x] Nadam: An integration of Nesterov momentum into the Adam algorithm for often-faster convergence.
+- [x] Nadam: An integration of Nesterov momentum into the Adam algorithm for often-faster convergence.
 
--[x] Muon Optimizer: A SOTA optimizer for large models. It applies gradient orthogonalization (via Newton-Schulz iteration) specifically to 2D weight matrices, leading to significant efficiency gains and improved stability.
+- [x] Muon Optimizer: A SOTA optimizer for large models. It applies gradient orthogonalization (via Newton-Schulz iteration) specifically to 2D weight matrices, leading to significant efficiency gains and improved stability.
 
 
 ## ⏳ On the Workbench (Planned Features)
 Gradient Add-ons & Techniques
 
--[ ] GrokFast: A gradient filter designed to accelerate "grokking". It works by amplifying the slow-varying, low-frequency components of the gradients, which are linked to generalization.
+- [ ] GrokFast: A gradient filter designed to accelerate "grokking". It works by amplifying the slow-varying, low-frequency components of the gradients, which are linked to generalization.
 
--[ ] OrthoGrad: A gradient projection technique for "grokking". From the Grokking at the Edge of Numerical Stability, orthograd combats the naive loss minimization problem.
+- [ ] OrthoGrad: A gradient projection technique for "grokking". From the Grokking at the Edge of Numerical Stability, orthograd combats the naive loss minimization problem.
 
 
 # Docs
