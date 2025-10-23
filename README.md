@@ -30,13 +30,15 @@ Gradient Add-ons & Techniques
 -[ ] OrthoGrad: A gradient projection technique for "grokking". From the Grokking at the Edge of Numerical Stability, orthograd combats the naive loss minimization problem.
 
 
-## Docs
+# Docs
 All optimizers in this repo are implemented to be a drop in replacement for the default keras optimizers.
 
 ---
+
 ## Muon
 
 ---
+
 **Overview:**
 
 The current SOTA optimizer used to train Kimi-K2.
@@ -135,6 +137,7 @@ model.fit()
 ## Nadam
 
 ---
+
 **Overview**
 
 Nadam optimizer is Adam with Nesterov momentum which leads to faster convergence.
