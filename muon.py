@@ -3,7 +3,7 @@ from keras.src import ops
 from keras.src.optimizers import optimizer
 import re
 
-
+# based on https://kellerjordan.github.io/posts/muon/
 class Muon(optimizer.Optimizer):
     def __init__(self,
                  learning_rate=1e-3,
@@ -22,8 +22,9 @@ class Muon(optimizer.Optimizer):
                  muon_c=2.0315,
                  ns_steps=5,
                  epsilon=1e-7,
+                 name="muon",
                  **kwargs):
-        super().__init__(learning_rate=learning_rate, **kwargs)
+        super().__init__(learning_rate=learning_rate, name=name, **kwargs)
         self.adam_lr_ratio = adam_lr_ratio
         self.use_nadam = use_nadam
         self.caution = caution
@@ -86,6 +87,7 @@ class Muon(optimizer.Optimizer):
 
     def apply_weight_decay(self, variable, learning_rate):
         weight_decay = ops.cast(self.weight_decay, dtype=variable.dtype)
+        learning_rate = ops.cast(learning_rate, dtype=variable.dtype)
         variable.assign_sub(learning_rate * weight_decay * variable)
 
     def apply_caution(self, update, gradient, learning_rate, epsilon):
@@ -130,6 +132,7 @@ class Muon(optimizer.Optimizer):
         muon_m.assign(muon_m_update)
 
         update = gradient + muon_m_update * muon_beta if self.nesterov else muon_m_update
+        # for some reason, using grad * (1 - beta) + update * beta doesn't work
 
         is_reshaped = False
         if update.ndim > 2:

@@ -8,11 +8,12 @@ class Nadam(optimizer.Optimizer):
                  weight_decay=0.004,
                  caution=True,
                  epsilon=1e-8,
-                 name="adam",
+                 name="Nadam",
                  **kwargs):
         super().__init__(learning_rate=learning_rate,
                          weight_decay=weight_decay,
-                         name=name, **kwargs)
+                         name=name,
+                         **kwargs)
         self.beta_1 = beta_1
         self.beta_2 = beta_2
         self.epsilon = epsilon
