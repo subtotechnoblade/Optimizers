@@ -69,7 +69,7 @@ You are free to tune the adam_lr_ratio, but it most likely won't be necessary.
 - **`muon_c`** *(float, default=2.0315)*:  Newton-Schulz c
 - **`ns_steps`** *(int, default=5)*:  Newton-Schulz iterations
 - **`epsilon`** *(float, default=1e-8)*:  Epsilon to prevent divide by 0
-- **`name`** *(str, default="Muon)*: Optimizer name
+- **`name`** *(str, default="Muon")*: Optimizer name
 
 **Example Usage:**
 ```python
