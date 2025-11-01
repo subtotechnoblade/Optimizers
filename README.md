@@ -30,7 +30,7 @@ Gradient Add-ons & Techniques
 - [ ] OrthoGrad: A gradient projection technique for "grokking". From the Grokking at the Edge of Numerical Stability, orthograd combats the naive loss minimization problem.
 
 
-# Docs
+# 📖 Docs
 All optimizers in this repo are implemented to be a drop in replacement for the default keras optimizers.
 
 ---
@@ -56,7 +56,7 @@ You are free to tune the adam_lr_ratio, but it most likely won't be necessary.
 - **`learning_rate`** *(float, default=1e-3)*: Learning rate for the Muon.
 - **`adam_lr_ratio`** *(float, default=1.0)*: The ratio, adam_lr = adam_lr_ratio * muon_lr
 - **`weight_decay`** *(float, default=0.004)*: The decoupled weight decay factor.
-- **`use_nadam`** *(bool, default=True)*: Uses NadamW instead of AdamW for non-hidden weight updates.
+- **`use_nadam`** *(bool, default=True)*: Uses Nadam instead of Adam for non-hidden weight updates.
 - **`exclude_layers`** *(list[str], default=[])*: A list of layer names to avoid muon updates, uses Adam or Nadam instead.
 - **`exclude_embeddings`** *(bool, default=True)*: If True avoided updating embedding layers with Muon, uses Adam or Nadam instead
 - **`caution`** *(bool, default=True)*: Applies cautious updates. 
@@ -100,9 +100,11 @@ model.fit()
 
 
 ## Adam
-**Overview:**
 
 ---
+
+**Overview:**
+
 
 The classic Adam optimizer which uses the first and second moments of the gradients.
 It is enhanced with decoupled weight decay and cautious updates.
@@ -138,7 +140,7 @@ model.fit()
 
 ---
 
-**Overview**
+**Overview:**
 
 Nadam optimizer is Adam with Nesterov momentum which leads to faster convergence.
 It is enhanced by decoupled weight decay and cautious updates.
@@ -174,4 +176,6 @@ Contributions, issues, and feature requests are welcome!
 If you are interested in implementing one of the "Planned Features,"
 please feel free to open an issue to discuss the implementation details or submit a pull request.
 
+
+## Citations
 

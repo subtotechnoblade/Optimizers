@@ -67,6 +67,8 @@ model.save_weights("test.weights.h5")
 
 model.load_weights("test.weights.h5")
 
+# optimizer = Grokfast_EMA(Orthograd(Muon(1e-3, weight_decay=1e-4, caution=False,
+#                    exclude_layers=["in", "out"])))
 optimizer = Orthograd(Grokfast_EMA(Muon(1e-3, weight_decay=1e-4, caution=False,
                    exclude_layers=["in", "out"])))
 
@@ -90,6 +92,21 @@ Epoch 7/10
  52/469 ━━━━━━━━━━━━━━━━━━━━ 18s 45ms/step - loss: 0.0035 - sparse_categorical_accuracy: 0.9997"""
 
 # muon with ortho grad, grokfast , and wd=1e-4
+"""469/469 ━━━━━━━━━━━━━━━━━━━━ 31s 40ms/step - loss: 0.6322 - sparse_categorical_accuracy: 0.8507 - val_loss: 0.5546 - val_sparse_categorical_accuracy: 0.8949
+Epoch 2/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 14s 29ms/step - loss: 0.1300 - sparse_categorical_accuracy: 0.9841 - val_loss: 0.1196 - val_sparse_categorical_accuracy: 0.9821
+Epoch 3/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 14s 29ms/step - loss: 0.0939 - sparse_categorical_accuracy: 0.9925 - val_loss: 0.1404 - val_sparse_categorical_accuracy: 0.9809
+Epoch 4/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 14s 29ms/step - loss: 0.0770 - sparse_categorical_accuracy: 0.9970 - val_loss: 0.1863 - val_sparse_categorical_accuracy: 0.9739
+Epoch 5/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 14s 30ms/step - loss: 0.0720 - sparse_categorical_accuracy: 0.9987 - val_loss: 0.1594 - val_sparse_categorical_accuracy: 0.9839
+Epoch 6/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 14s 29ms/step - loss: 0.0702 - sparse_categorical_accuracy: 0.9992 - val_loss: 0.1372 - val_sparse_categorical_accuracy: 0.9818
+Epoch 7/10
+469/469 ━━━━━━━━━━━━━━━━━━━━ 14s 29ms/step - loss: 0.0694 - sparse_categorical_accuracy: 0.9996 - val_loss: 0.1184 - val_sparse_categorical_accuracy: 0.9837
+Epoch 8/10
+289/469 ━━━━━━━━━━━━━━━━━━━━ 5s 28ms/step - loss: 0.0667 - sparse_categorical_accuracy: 0.9998"""
 model.compile(
     # optimizer=Adam(0.001, weight_decay=None, caution=False),
     # optimizer=Nadam(0.001, weight_decay=None, caution=False),
