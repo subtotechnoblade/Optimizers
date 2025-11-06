@@ -6,7 +6,6 @@ class Nadam(optimizer.Optimizer):
                  beta_1=0.9,
                  beta_2=0.995,
                  weight_decay=0.004,
-                 caution=True,
                  epsilon=1e-8,
                  name="Nadam",
                  **kwargs):
@@ -17,9 +16,6 @@ class Nadam(optimizer.Optimizer):
         self.beta_1 = beta_1
         self.beta_2 = beta_2
         self.epsilon = epsilon
-
-        self.caution = caution
-
 
     def build(self, variables):
         super().build(variables)
@@ -59,12 +55,7 @@ class Nadam(optimizer.Optimizer):
         nesterov = (m_hat * beta_1) + ((1.0 - beta_1) * gradient) / (1.0 - beta_1_t)
         u = nesterov / (ops.sqrt(v_hat) + epsilon)
 
-        if self.caution:
-            mask = ops.where(u * gradient > 0, 1.0, 0.0)
-            scaled_lr = learning_rate * (mask / (ops.mean(mask) + epsilon))
-            final_u = u * mask * scaled_lr
-        else:
-            final_u = u * learning_rate
+        final_u = u * learning_rate
 
         variable.assign_sub(final_u)
 
@@ -78,5 +69,4 @@ class Nadam(optimizer.Optimizer):
             "beta_1": self.beta_1,
             "beta_2": self.beta_2,
             "epsilon": self.epsilon,
-            "caution": self.caution
         })

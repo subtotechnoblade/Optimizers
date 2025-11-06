@@ -66,10 +66,10 @@ model = create_model()
 model.save_weights("test.weights.h5")
 
 model.load_weights("test.weights.h5")
-
+# optimizer = Muon(1e-3, caution=False)
 # optimizer = Grokfast_EMA(Orthograd(Muon(1e-3, weight_decay=1e-4, caution=False,
 #                    exclude_layers=["in", "out"])))
-optimizer = Orthograd(Grokfast_EMA(Muon(1e-3, weight_decay=1e-4, caution=False,
+optimizer = Orthograd(Grokfast_EMA(Muon(1e-3, weight_decay=0.004, caution=False,
                    exclude_layers=["in", "out"])))
 
 # optimizer = Muon(1e-3, weight_decay=0.0, caution=False,
@@ -113,6 +113,7 @@ model.compile(
     optimizer=optimizer,
     loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
     metrics=[tf.keras.metrics.SparseCategoricalAccuracy()],
+    # jit_compile=False,
 )
 
 model.fit(
