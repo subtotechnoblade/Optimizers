@@ -8,6 +8,52 @@ The goal is to provide reliable implementations that are a drop in replacement f
 
 ---
 
+## Best Performing 
+
+Uses grokfast along with orthograd and muon to produce the fastest converging model. 
+Firstly, the gradients are orthogonalized to the weights, then the slow moving parts are amplified. 
+Finally, this gradient is passed to muon.
+
+**Example Usage**
+
+```python
+import tensorflow as tf
+
+from muon import Muon
+from grok_fast import Grokfast_EMA
+from ortho_grad import Orthograd
+
+
+base_optimizer = Muon(
+    learning_rate=1e-3,
+    adam_lr_ratio=1.0,
+    use_nadam=True,
+    weight_decay=0.004,
+    exclude_layers=["layer_1", "out_layer"],
+    exclude_embeddings=True,
+    caution=True,
+    nesterov=True,
+    adam_beta_1=0.9,
+    adam_beta_2=0.995,
+    muon_beta=0.95)
+optimizer = Orthograd(Grokfast_EMA(base_optimizer, alpha=0.99, lamb=5.0))
+# Must be orthograd then Grokfast then the base optimizer.
+# This is because grok fast needs to amplify the slow-moving parts of the orthogonal gradients.
+# If it is the opposite way, grok fast may be amplifying the wrong slow moving gradients.  
+# If not, you will have degraded performance
+
+model = model = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation="relu", name="layer_1"), # uses Adam/Nadam
+    tf.keras.layers.Dense(512, activation="relu"), # hidden layer, uses muon
+    tf.keras.layers.Dense(10, name="out_layer") # uses Adam/Nadam
+])
+model.compile(optimizer=optimizer)
+model.fit()
+
+```
+
+--- 
+
 ## 🚀 Project Roadmap
 This project is actively developed. Here is the current status of implemented and planned features.
 
@@ -21,13 +67,11 @@ Core Optimizers
 
 - [x] Muon Optimizer: A SOTA optimizer for large models. It applies gradient orthogonalization (via Newton-Schulz iteration) specifically to 2D weight matrices, leading to significant efficiency gains and improved stability.
 
-
-## ⏳ On the Workbench (Planned Features)
 Gradient Add-ons & Techniques
 
-- [ ] GrokFast: A gradient filter designed to accelerate "grokking". It works by amplifying the slow-varying, low-frequency components of the gradients, which are linked to generalization.
+- [x] GrokFast: A gradient filter designed to accelerate "grokking". It works by amplifying the slow-varying, low-frequency components of the gradients, which are linked to generalization.
 
-- [ ] OrthoGrad: A gradient projection technique for "grokking". From the Grokking at the Edge of Numerical Stability, orthograd combats the naive loss minimization problem.
+- [x] OrthoGrad: A gradient projection technique for "grokking". From the Grokking at the Edge of Numerical Stability, orthograd combats the naive loss minimization problem.
 
 
 # 📖 Docs
@@ -59,7 +103,6 @@ You are free to tune the adam_lr_ratio, but it most likely won't be necessary.
 - **`use_nadam`** *(bool, default=True)*: Uses Nadam instead of Adam for non-hidden weight updates.
 - **`exclude_layers`** *(list[str], default=[])*: A list of layer names to avoid muon updates, uses Adam or Nadam instead.
 - **`exclude_embeddings`** *(bool, default=True)*: If True avoided updating embedding layers with Muon, uses Adam or Nadam instead
-- **`caution`** *(bool, default=True)*: Applies cautious updates. 
 - **`nesterov`** *(bool, default=True)*: Uses Nesterov momentum for Muon
 - **`adam_beta_1`** *(float, default=0.90)*: Decay rate for first momentum estimates in Adam or Nadam.
 - **`adam_beta_2`** *(float, default=0.995)*: Decay rate for second momentum estimates in Adam or Nadam.
@@ -115,7 +158,6 @@ It is enhanced with decoupled weight decay and cautious updates.
 - **`beta_1`** *(float, default=0.90)*: Decay for the first moment estimates.
 - **`beta_2`** *(float, default=0.995)*: Decay for the second moment estimates.
 - **`weight_decay`** *(float, default=0.004)*: Decay for the second moment estimates.
-- **`cation`** *(bool, default=True)*: Use caution, applies cautious updates for better stability.
 - **`epsilon`** *(float, default=1e-8)*: Epsilon to prevent divide by 0.
 - **`name`** *(str, default="Adam")*: Optimizer name.
 
@@ -150,7 +192,6 @@ It is enhanced by decoupled weight decay and cautious updates.
 - **`beta_1`** *(float, default=0.90)*: Decay for the first moment estimates.
 - **`beta_2`** *(float, default=0.995)*: Decay for the second moment estimates.
 - **`weight_decay`** *(float, default=0.004)*: Decay for the second moment estimates.
-- **`cation`** *(bool, default=True)*: Use caution, applies cautious updates for better stability.
 - **`epsilon`** *(float, default=1e-8)*: Epsilon to prevent divide by 0.
 - **`name`** *(str, default="Nadam")*: Optimizer name.
 - 
@@ -168,6 +209,63 @@ optimizer = Nadam(
 
 model = create_model()
 model.compile(optimizer=optimizer)
+model.fit()
+```
+
+# Gradient Addons
+Used in unison with any keras optimizer.
+
+## Grokfast_EMA
+
+---
+
+**Overview:**
+
+Grokfast_EMA is an EMA filter that amplifies the slow moving gradients.
+
+**Parameters:**
+- **`base_optimizer`** *(tf.keras.optimizer.Optimizer)*: The base optimizer. Any keras optimizer instance.
+- **`alpha`** *(float, default=0.99)*: Decay for the EMA filter.
+- **`lamb`** *(float, default=5.0)*: Slow gradient scaling factor.
+
+**Example Usage:**
+
+```python
+import tensorflow as tf
+from grok_fast import Grokfast_EMA
+
+base_optimizer = tf.keras.optimizers.Adam(1e-3) # this can be any keras optimizer, including the ones in this repo
+grokfast_adam = Grokfast_EMA(base_optimizer, alpha=0.99, lamb=5.0)
+
+model = create_model()
+model.compile(optimizer=grokfast_adam)
+model.fit()
+```
+
+## Orthograd
+
+---
+
+**Overview:**
+
+Orthograd obtains the orthogonal part of the gradient by projecting gradient onto the weights.
+Thus solving the problem of naive loss minimization by updating the weights in an orthogonal direction
+rather than continuing to increase the logits by a scaling factor. Increasing the logits causes softamx collapse.
+
+**Parameters:**
+- **`base_optimizer`** *(tf.keras.optimizer.Optimizer)*: The base optimizer. Any keras optimizer instance.
+
+**Example Usage:**
+
+```python
+import tensorflow as tf
+from ortho_grad import Orthograd
+
+base_optimizer = tf.keras.optimizers.Adam(1e-3) # this can be any keras optimizer, including the ones in this repo
+orthograd_adam = Orthograd(base_optimizer)
+
+model = create_model()
+model.compile(optimizer=orthograd_adam)
 model.fit()
 ```
 
