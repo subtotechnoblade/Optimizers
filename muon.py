@@ -9,7 +9,7 @@ class Muon(optimizer.Optimizer):
     def __init__(self,
                  learning_rate=1e-3,
                  adam_lr_ratio=1.0,
-                 use_nadam=True,
+                 use_nadam=False,
                  weight_decay=0.004,
                  exclude_layers=[],
                  exclude_embeddings=True,
@@ -20,7 +20,7 @@ class Muon(optimizer.Optimizer):
                  muon_a=3.4445,
                  muon_b=-4.7750,
                  muon_c=2.0315,
-                 ns_steps=5,
+                 ns_steps=6,
                  epsilon=1e-8,
                  name="Muon",
                  **kwargs):
@@ -125,7 +125,7 @@ class Muon(optimizer.Optimizer):
         muon_m_update = muon_beta * muon_m + gradient * (1 - muon_beta)
         muon_m.assign(muon_m_update)
 
-        update = gradient + muon_m_update * muon_beta if self.nesterov else muon_m_update
+        update = gradient * (1 - muon_m_update) + muon_m_update * muon_beta if self.nesterov else muon_m_update
         # for some reason, using grad * (1 - beta) + update * beta doesn't work
 
         is_reshaped = False
@@ -139,7 +139,7 @@ class Muon(optimizer.Optimizer):
         grad_shape = tf.shape(gradient)
         d_in = ops.cast(grad_shape[-1], dtype=tf.float32)
         d_out = ops.cast(grad_shape[-2], dtype=tf.float32)
-        scaling_factor = 0.2 * ops.sqrt(ops.maximum(1.0, d_out / d_in))
+        scaling_factor = ops.sqrt(ops.maximum(1.0, d_out / d_in))
         update *= scaling_factor
 
         if is_reshaped:
@@ -188,13 +188,13 @@ class Muon(optimizer.Optimizer):
         adam_learning_rate = self.adam_lr_ratio * muon_learning_rate
 
         if self.muon_momentums[self._get_variable_index(variable)] is not None:
+            self.apply_weight_decay(variable, muon_learning_rate)
             update = self.muon_update(variable, gradient, muon_learning_rate)
             variable.assign_sub(update)
-            self.apply_weight_decay(variable, muon_learning_rate)
         else:
+            self.apply_weight_decay(variable, adam_learning_rate)
             update = self.adam_update(variable, gradient, adam_learning_rate)
             variable.assign_sub(update)
-            self.apply_weight_decay(variable, adam_learning_rate)
 
     def get_config(self):
         config = super().get_config()
