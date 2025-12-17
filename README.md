@@ -35,10 +35,6 @@ base_optimizer = Muon(
     adam_beta_2=0.995,
     muon_beta=0.95)
 optimizer = Orthograd(base_optimizer)
-# Must be orthograd then Grokfast then the base optimizer.
-# This is because grok fast needs to amplify the slow-moving parts of the orthogonal gradients.
-# If it is the opposite way, grok fast may be amplifying the wrong slow moving gradients.  
-# If not, you will have degraded performance
 
 model = model = tf.keras.Sequential([
     tf.keras.layers.Dense(64, activation="relu", name="layer_1"), # uses Adam/Nadam
