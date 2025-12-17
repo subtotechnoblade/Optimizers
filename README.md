@@ -10,9 +10,8 @@ The goal is to provide reliable implementations that are a drop in replacement f
 
 ## Best Performing 
 
-Uses grokfast along with orthograd and muon to produce the fastest converging model. 
-Firstly, the gradients are orthogonalized to the weights, then the slow moving parts are amplified. 
-Finally, this gradient is passed to muon.
+Uses orthograd with muon to produce the fastest converging model. 
+Firstly, the gradients are orthogonalized to the weights and then passed to muon. 
 
 **Example Usage**
 
@@ -20,7 +19,6 @@ Finally, this gradient is passed to muon.
 import tensorflow as tf
 
 from muon import Muon
-from grok_fast import Grokfast_EMA
 from ortho_grad import Orthograd
 
 
@@ -36,7 +34,7 @@ base_optimizer = Muon(
     adam_beta_1=0.9,
     adam_beta_2=0.995,
     muon_beta=0.95)
-optimizer = Orthograd(Grokfast_EMA(base_optimizer, alpha=0.99, lamb=5.0))
+optimizer = Orthograd(base_optimizer)
 # Must be orthograd then Grokfast then the base optimizer.
 # This is because grok fast needs to amplify the slow-moving parts of the orthogonal gradients.
 # If it is the opposite way, grok fast may be amplifying the wrong slow moving gradients.  
